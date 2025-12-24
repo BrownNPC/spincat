@@ -7,14 +7,16 @@ import (
 )
 
 type Config struct {
-	Size  int
-	Speed float64
+	Size      int
+	Speed     float64
+	SpinSpeed float64
 }
 
 func DefaultConfig() Config {
 	return Config{
-		Size:  72,
-		Speed: 2.0,
+		Size:      72,
+		Speed:     4.0,
+		SpinSpeed: 0.75,
 	}
 }
 
@@ -32,11 +34,11 @@ func LoadConfig(path string) Config {
 		}
 		return DefaultConfig()
 	}
-	config := new(Config)
-	if err := json.Unmarshal(cfgBytes, config); err != nil {
+	config := DefaultConfig()
+	if err := json.Unmarshal(cfgBytes, &config); err != nil {
 		fmt.Println("Failed to read config file:", err)
 		fmt.Println("Delete the file or fix it", path)
 		os.Exit(1)
 	}
-	return *config
+	return config
 }

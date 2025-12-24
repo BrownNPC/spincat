@@ -1,4 +1,4 @@
-module main
+module spincat
 
 go 1.25.1
 

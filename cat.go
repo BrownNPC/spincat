@@ -2,43 +2,86 @@ package main
 
 import (
 	"bytes"
-	"embed"
-	"fmt"
-	"image"
+	_ "embed"
+	"image/gif"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func NewCat() Cat {
-	var CatGif []*ebiten.Image
-	entry, err := CatSpinGIF.ReadDir("cat-spin")
+type Cat struct {
+	X, Y           float64
+	idle           bool
+	Distance       int
+	AnimationFrame int
+	// Allow for slower spin speed
+	FrameAccumulator float64
+	FrameStep        int
+	GifFrames        []*ebiten.Image
+	SpinSpeed        float64
+	GifDelays        []int // ticks to hold each frame for
+}
+
+//go:embed spin.gif
+var CatSpinGIF []byte
+
+func NewCat(spinSpeed float64) Cat {
+	g, err := gif.DecodeAll(bytes.NewReader(CatSpinGIF))
 	if err != nil {
-		panic(err)
+		panic("unable to decode spin.gif")
 	}
-	entries := len(entry)
-	for i := range entries {
-		frame, err := CatSpinGIF.ReadFile(fmt.Sprintf("cat-spin/frame_%04d.png", i))
-		if err != nil {
-			panic(err)
-		}
-		img, _, err := image.Decode(bytes.NewReader(frame))
-		CatGif = append(CatGif, ebiten.NewImageFromImage(img))
+	frames := make([]*ebiten.Image, len(g.Image))
+	delays := make([]int, len(g.Delay))
+	for i, img := range g.Image {
+		frames[i] = ebiten.NewImageFromImage(img)
+		// Gif uses 100 ticks per second, our app uses 60 tps
+		delays[i] = max(g.Delay[i]*60/100, 1)
 	}
-	return Cat{Animation: CatGif}
+	return Cat{
+		GifFrames: frames,
+		GifDelays: delays,
+		// Start on frame 1
+		AnimationFrame: 1,
+		SpinSpeed:      spinSpeed,
+	}
 }
 func (c *Cat) Draw(screen *ebiten.Image) {
-	screen.DrawImage(c.Animation[c.AnimationFrame], &ebiten.DrawImageOptions{})
+	screen.DrawImage(c.GifFrames[c.AnimationFrame], &ebiten.DrawImageOptions{})
+}
+func (c *Cat) TickGif() {
+	// Wait the encoded amount of frames
+	if c.FrameStep >= c.GifDelays[c.AnimationFrame] {
+		c.FrameStep = 0
+		c.AnimationFrame = max((c.AnimationFrame+1)%len(c.GifFrames), 1)
+	}
+}
+func (c *Cat) SetIdle(v bool) {
+	if v == c.idle {
+		return
+	}
+	c.idle = v
+	c.FrameStep = 0
+	c.FrameAccumulator = 0
+	if v {
+		c.AnimationFrame = 0
+	} else {
+		c.AnimationFrame = 1
+	}
 
 }
-func (c *Cat) Update(FPS int) {
-	c.FrameStep++
-	if !c.Idle {
-		if c.FrameStep > 60/FPS {
-			c.FrameStep = 0
-			c.AnimationFrame = (c.AnimationFrame + 1) % len(c.Animation)
+func (c *Cat) Update() {
+
+	if !c.idle {
+		// allow for slower or faster spin speeds
+		c.FrameAccumulator += c.SpinSpeed
+
+		for c.FrameAccumulator >= 1 {
+			c.FrameAccumulator -= 1.0
+			c.FrameStep++
+			c.TickGif()
 		}
-	} else if c.Idle {
+		c.TickGif()
+	} else if c.idle {
 		c.AnimationFrame = 0
 	}
 
@@ -54,22 +97,10 @@ func (c *Cat) Update(FPS int) {
 		dx = -dx
 	}
 	c.Distance = dx + dy
-	if !c.Idle {
+	if !c.idle {
 		c.FollowCursor(float64(x), float64(y))
 	}
 }
-
-type Cat struct {
-	X, Y           float64
-	Idle           bool
-	Distance       int
-	AnimationFrame int
-	FrameStep      int
-	Animation      []*ebiten.Image
-}
-
-//go:embed cat-spin
-var CatSpinGIF embed.FS
 
 func (m *Cat) FollowCursor(x, y float64) {
 	r := math.Atan2(y, x)
