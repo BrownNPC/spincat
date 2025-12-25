@@ -7,18 +7,23 @@ import (
 )
 
 type Config struct {
-	Size      int
-	Speed     float64
-	SpinSpeed float64
+	Size             int
+	Speed            float64
+	SpinSpeed        float64
+	MousePassthrough bool
+	WindowDecorations      bool
 }
 
 func DefaultConfig() Config {
 	return Config{
-		Size:      80,
-		Speed:     4.0,
-		SpinSpeed: 0.75,
+		Size:             80,
+		Speed:            4.0,
+		SpinSpeed:        0.75,
+		MousePassthrough: true,
+		WindowDecorations:      false,
 	}
 }
+
 // Creates a default config on disk or loads an existing one if it exists.
 func LoadConfig(path string) Config {
 	cfgBytes, err := os.ReadFile(path)

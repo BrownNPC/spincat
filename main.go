@@ -23,6 +23,8 @@ func init() {
 			Cfg = LoadConfig(configFilePath)
 			ebiten.SetWindowSize(Cfg.Size, Cfg.Size)
 			game.cat.SpinSpeed = Cfg.SpinSpeed
+			ebiten.SetWindowMousePassthrough(Cfg.MousePassthrough)
+			ebiten.SetWindowDecorated(Cfg.WindowDecorations)
 		}
 	}()
 }
@@ -69,11 +71,11 @@ func main() {
 	ebiten.SetScreenClearedEveryFrame(true)
 	ebiten.SetTPS(60)
 	ebiten.SetVsyncEnabled(true)
-	ebiten.SetWindowDecorated(false)
 	ebiten.SetWindowFloating(true)
-	ebiten.SetWindowMousePassthrough(true)
 	ebiten.SetWindowSize(Cfg.Size, Cfg.Size)
 	ebiten.SetWindowTitle("Spin Cat")
+	ebiten.SetWindowMousePassthrough(Cfg.MousePassthrough)
+	ebiten.SetWindowDecorated(Cfg.WindowDecorations)
 
 	if err := ebiten.RunGameWithOptions(&game, &ebiten.RunGameOptions{
 		ScreenTransparent: true,
