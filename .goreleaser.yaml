@@ -1,3 +1,5 @@
+archives:
+  - format: binary
 builds:
   - id: default
     goos:

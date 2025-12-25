@@ -12,6 +12,8 @@
 
 ## Install
 
+### [Download Release](https://github.com/BrownNPC/spincat/releases/latest)
+
 ### From Source (deps needed on Linux and Mac OS, see [Building](#building))
 ```
 go install github.com/BrownNPC/spincat@latest
