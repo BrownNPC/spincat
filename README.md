@@ -3,12 +3,12 @@
 
 ### An annoying little desktop pet
 
- Spin cat follows your cursor around and makes an annoying sound.
+ Spin cat will chase your mouse while making an annoying sound.
 
 
 ![spincat](./spin.gif)
 
-Perfect for installing on your school computer. (not legal advice)
+> Perfect for installing on your school computer. (not recommended for legal reasons)
 
 ## Install
 
