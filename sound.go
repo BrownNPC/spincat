@@ -17,14 +17,32 @@ var SpinWav []byte
 type Audio struct {
 	stream beep.StreamSeekCloser
 	ctrl   *beep.Ctrl
+	mute   bool
 }
 
+func (a *Audio) SetMute(v bool) {
+	if a.mute == v {
+		return
+	}
+	if v {
+		a.mute = true
+		a.Stop()
+	} else {
+		a.mute = false
+	}
+}
 func (a *Audio) PlayLoop() {
+	if a.mute {
+		return
+	}
 	speaker.Lock()
 	a.ctrl.Paused = false
 	speaker.Unlock()
 }
 func (a *Audio) Stop() {
+	if a.mute {
+		return
+	}
 	speaker.Lock()
 	a.stream.Seek(0)
 	a.ctrl.Paused = true

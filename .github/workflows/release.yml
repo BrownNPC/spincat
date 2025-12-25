@@ -50,6 +50,11 @@ jobs:
     - name: Build
       run: ${{ matrix.env_vars }} go build ${{ matrix.build_args }} -o dist/${{ matrix.artifact_name }}
 
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: ${{ github.ref }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2

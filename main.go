@@ -25,6 +25,7 @@ func init() {
 			game.cat.SpinSpeed = Cfg.SpinSpeed
 			ebiten.SetWindowMousePassthrough(Cfg.MousePassthrough)
 			ebiten.SetWindowDecorated(Cfg.WindowDecorations)
+			game.cat.SetMute(Cfg.Quiet)
 		}
 	}()
 }
@@ -76,6 +77,7 @@ func main() {
 	ebiten.SetWindowTitle("Spin Cat")
 	ebiten.SetWindowMousePassthrough(Cfg.MousePassthrough)
 	ebiten.SetWindowDecorated(Cfg.WindowDecorations)
+	game.cat.SetMute(Cfg.Quiet)
 
 	if err := ebiten.RunGameWithOptions(&game, &ebiten.RunGameOptions{
 		ScreenTransparent: true,

@@ -7,20 +7,22 @@ import (
 )
 
 type Config struct {
-	Size             int
-	Speed            float64
-	SpinSpeed        float64
-	MousePassthrough bool
-	WindowDecorations      bool
+	Size              int
+	Speed             float64
+	SpinSpeed         float64
+	MousePassthrough  bool
+	WindowDecorations bool
+	Quiet             bool
 }
 
 func DefaultConfig() Config {
 	return Config{
-		Size:             80,
-		Speed:            4.0,
-		SpinSpeed:        0.75,
-		MousePassthrough: true,
-		WindowDecorations:      false,
+		Size:              80,
+		Speed:             4.0,
+		SpinSpeed:         0.75,
+		Quiet:             false,
+		MousePassthrough:  true,
+		WindowDecorations: false,
 	}
 }
 
@@ -29,7 +31,7 @@ func LoadConfig(path string) Config {
 	cfgBytes, err := os.ReadFile(path)
 	if err != nil {
 		// File does not exist
-		cfgBytes, err = json.Marshal(DefaultConfig())
+		cfgBytes, err = json.MarshalIndent(DefaultConfig(),"","")
 		if err != nil {
 			panic("Failed to marshall default config: " + err.Error())
 		}
