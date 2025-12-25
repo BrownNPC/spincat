@@ -20,6 +20,7 @@ type Cat struct {
 	GifFrames        []*ebiten.Image
 	SpinSpeed        float64
 	GifDelays        []int // ticks to hold each frame for
+	Audio
 }
 
 //go:embed spin.gif
@@ -43,6 +44,7 @@ func NewCat(spinSpeed float64) Cat {
 		// Start on frame 1
 		AnimationFrame: 1,
 		SpinSpeed:      spinSpeed,
+		Audio:          LoadAudio(),
 	}
 }
 func (c *Cat) Draw(screen *ebiten.Image) {
@@ -62,9 +64,11 @@ func (c *Cat) SetIdle(v bool) {
 	c.idle = v
 	c.FrameStep = 0
 	c.FrameAccumulator = 0
-	if v {
+	if c.idle {
+		c.Audio.Stop()
 		c.AnimationFrame = 0
 	} else {
+		c.Audio.PlayLoop()
 		c.AnimationFrame = 1
 	}
 
@@ -108,31 +112,31 @@ func (m *Cat) FollowCursor(x, y float64) {
 	switch {
 	case a <= 292.5 && a > 247.5:
 		//up
-		m.Y -= Speed
+		m.Y -= Cfg.Speed
 	case a <= 337.5 && a > 292.5:
 		// up right
-		m.X += Speed / math.Sqrt2
-		m.Y -= Speed / math.Sqrt2
+		m.X += Cfg.Speed / math.Sqrt2
+		m.Y -= Cfg.Speed / math.Sqrt2
 	case a <= 22.5 || a > 337.5:
 		// right
-		m.X += Speed
+		m.X += Cfg.Speed
 	case a <= 67.5 && a > 22.5:
 		// down right
-		m.X += Speed / math.Sqrt2
-		m.Y += Speed / math.Sqrt2
+		m.X += Cfg.Speed / math.Sqrt2
+		m.Y += Cfg.Speed / math.Sqrt2
 	case a <= 112.5 && a > 67.5:
 		// down
-		m.Y += Speed
+		m.Y += Cfg.Speed
 	case a <= 157.5 && a > 112.5:
 		// down left
-		m.X -= Speed / math.Sqrt2
-		m.Y += Speed / math.Sqrt2
+		m.X -= Cfg.Speed / math.Sqrt2
+		m.Y += Cfg.Speed / math.Sqrt2
 	case a <= 202.5 && a > 157.5:
 		// left
-		m.X -= Speed
+		m.X -= Cfg.Speed
 	case a <= 247.5 && a > 202.5:
 		// up left
-		m.X -= Speed
-		m.Y -= Speed
+		m.X -= Cfg.Speed
+		m.Y -= Cfg.Speed
 	}
 }

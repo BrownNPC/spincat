@@ -11,11 +11,21 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var Cfg = LoadConfig(filepath.Join(os.Args[0], "..", "spincat-config.json"))
-var (
-	Width, Height = Cfg.Size, Cfg.Size
-	Speed         = Cfg.Speed
-)
+var configFilePath = filepath.Join(os.Args[0], "..", "spincat-config.json")
+
+var Cfg = LoadConfig(configFilePath)
+
+// Reload config when file is updated
+func init() {
+	go func() {
+		for {
+			WatchFile(configFilePath)
+			Cfg = LoadConfig(configFilePath)
+			ebiten.SetWindowSize(Cfg.Size, Cfg.Size)
+			game.cat.SpinSpeed = Cfg.SpinSpeed
+		}
+	}()
+}
 
 const RenderWidth, RenderHeight = 320, 320
 
@@ -51,9 +61,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return RenderWidth, RenderHeight
 }
-func main() {
-	var game = Game{cat: NewCat(Cfg.SpinSpeed)}
 
+var game = Game{cat: NewCat(Cfg.SpinSpeed)}
+
+func main() {
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetScreenClearedEveryFrame(true)
 	ebiten.SetTPS(60)
@@ -61,7 +72,7 @@ func main() {
 	ebiten.SetWindowDecorated(false)
 	ebiten.SetWindowFloating(true)
 	ebiten.SetWindowMousePassthrough(true)
-	ebiten.SetWindowSize(Width, Height)
+	ebiten.SetWindowSize(Cfg.Size, Cfg.Size)
 	ebiten.SetWindowTitle("Spin Cat")
 
 	if err := ebiten.RunGameWithOptions(&game, &ebiten.RunGameOptions{

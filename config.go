@@ -14,12 +14,11 @@ type Config struct {
 
 func DefaultConfig() Config {
 	return Config{
-		Size:      72,
+		Size:      80,
 		Speed:     4.0,
 		SpinSpeed: 0.75,
 	}
 }
-
 // Creates a default config on disk or loads an existing one if it exists.
 func LoadConfig(path string) Config {
 	cfgBytes, err := os.ReadFile(path)
