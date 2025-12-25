@@ -22,7 +22,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo install -y \
+          sudo apt install -y \
             libc6-dev \
             libgl1-mesa-dev \
             libxcursor-dev \
