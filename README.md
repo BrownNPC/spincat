@@ -50,7 +50,7 @@ go build .
 
 ### Linux/MacOS
 
-> [⚠️ C compiler & Dependencies must be installed.](https://ebitengine.org/en/documents/install.html#Installing_dependencies)
+> [⚠️ C compiler & Dependencies must be installed.](https://ebitengine.org/en/documents/install.html)
 
 ```
 go build .
